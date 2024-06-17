@@ -1,6 +1,9 @@
 import os
 import random
 import asyncio
+import io
+import requests
+import base64
 from fastapi import APIRouter
 from app.models.invoice import Invoice, InfoToSignXml
 from app.utils.create_access_key import createAccessKey
@@ -81,12 +84,25 @@ async def sign_invoice(invoice: Invoice):
             # get xml signed content
             xmlSignedValue = responseAuthorization['xml']
 
+        pdfFile = None
+        if xmlSignedValue:
+            xml_file = io.StringIO(xmlSignedValue)
+            files = {
+                'fichero_usuario[]': ('factura.xml', xml_file, 'application/xml')
+            }
+
+            response = requests.post("https://dsiscom.com/xml-a-pdf-ecuador/xmlpdfv.php", files=files)
+            encoded_content = base64.b64encode(response.content)
+            pdfFile = encoded_content
+
+
         return {
             'result': {
                 'accessKey': accessKey,
                 'isReceived': isReceived,
                 'isAuthorized': isAuthorized,
-                'xmlFileSigned': xmlSignedValue
+                # 'xmlFileSigned': xmlSignedValue,
+                'pdfFile': pdfFile
             }
         }
     except Exception as e:
