@@ -132,11 +132,12 @@ def createXml(info: Invoice, accessKeyInvoice: str):
             valor = etree.SubElement(impuesto, 'valor')
             valor.text = str(item.taxValue)
 
-        infoAdicional = etree.SubElement(root, 'infoAdicional')
-        for item in info.additionalInfo:
-            campoAdicional = etree.SubElement(
-                infoAdicional, 'campoAdicional', attrib={'nombre': item.name})
-            campoAdicional.text = item.value
+        if len(info.additionalInfo) > 0:
+            infoAdicional = etree.SubElement(root, 'infoAdicional')
+            for item in info.additionalInfo:
+                campoAdicional = etree.SubElement(
+                    infoAdicional, 'campoAdicional', attrib={'nombre': item.name})
+                campoAdicional.text = item.value
 
         xml_string = etree.tostring(root, pretty_print=True).decode('utf-8')
 
