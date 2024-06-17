@@ -1,4 +1,4 @@
-*.p12
+**/**/*.p12
 envSignXml
 .env
 *.xml
